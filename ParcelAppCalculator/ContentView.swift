@@ -12,20 +12,52 @@ struct ContentView: View {
     @State private var height: String = ""
     @State private var width: String = ""
     @State private var depth: String = ""
-    @State private var length: String = ""
     @State private var cost: String = ""
     
-    var isDisabled:Bool {
-        weight.isEmpty || width.isEmpty || length.isEmpty || height.isEmpty
+    var isDisabled: Bool {
+        weight.isEmpty || width.isEmpty || height.isEmpty || depth.isEmpty
     }
     
-    private func calculateCost(){}
+    private func calculateCost(){
+        
+        print("parcel Data: \(weight), \(height), \(width), \(depth)")
+        
+        if let weightValue = Double(weight),
+           let heightValue = Double(height),
+           let widthValue = Double(width),
+           let depthValue = Double(depth),
+           weightValue > 0, heightValue > 0, depthValue > 0, widthValue > 0{
+            
+            let volume = depthValue * heightValue * widthValue
+            var totalCost = 3.00 //base cost
+            
+            // weight charge
+            
+            totalCost += weightValue * 0.50
+            
+            //volume charge
+            
+            totalCost += (volume / 1000) * 0.10
+            
+            // secure the minimal
+            
+            totalCost = max(totalCost, 4.00)
+            cost = String(format: "%.2f", totalCost)
+            
+            print("£"+cost)
+            
+        }else{
+            cost = "Error: Please enter valid numeric amount"
+        }
+           
+        
+    }
     
     
     var body: some View {
         
         VStack(spacing: 20){
-            Text("Parcel App Calculator")
+            Text("Parcel App Calculator 📦")
                 .font(.title)
                 .padding(10)
             
@@ -54,7 +86,7 @@ struct ContentView: View {
             
             
             HStack(alignment: .center, spacing: 10){
-                Label("Width(cm):", systemImage: "")
+                Label("Width (cm):", systemImage: "")
                     .labelStyle(.titleOnly)
                     .frame(width:120, alignment: .trailing)
                 
@@ -64,7 +96,7 @@ struct ContentView: View {
             }
             
             HStack(alignment: .center, spacing:10){
-                Label("Depth(cm):", systemImage: "")
+                Label("Depth (cm):", systemImage: "")
                     .labelStyle(.titleOnly)
                     .frame(width:120, alignment: .trailing)
                 
@@ -80,12 +112,31 @@ struct ContentView: View {
         Button("Calculate Cost") {
             calculateCost()
         }
-        .disabled(isDisabled)
+            .disabled(isDisabled)
             .padding()
             .background(isDisabled ? Color.gray : Color.blue)
-            .buttonStyle(.borderedProminent)
-           
+            .foregroundColor(.white)
+            .cornerRadius(8)
             .frame(maxWidth: .infinity, alignment:.trailing)
+            
+            
+            
+            if !cost.isEmpty{
+                if let costValue = Double(cost), costValue > 0.00 {
+                    Text("Total cost is £\(cost)")
+                    .foregroundColor(.green)
+                    .font(.headline)
+                    .frame(maxWidth: .infinity, alignment: .trailing)
+                                    
+                    
+                } else {
+                    Text(cost)
+                        .foregroundColor(.red)
+                        .font(.headline)
+                        .frame(maxWidth: .infinity, alignment: .trailing)
+                }
+            }
+           
             
     }
         .padding()
